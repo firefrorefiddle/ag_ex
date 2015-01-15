@@ -35,6 +35,17 @@ private:
 	void modelMCF();
 	void modelMTZ();
 
+	inline int index3(int i,int j,int k)
+	{
+	  return i * n * m + j * m + k;
+	}
+	
+	inline int index2(int i,int j)
+	{
+	  return i * n + j;
+	}
+
+
 public:
 
 	tcbvrp_ILP( Instance& _instance, string _model_type);

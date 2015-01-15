@@ -86,8 +86,54 @@ void tcbvrp_ILP::setCPLEXParameters()
 	cplex.setParam( IloCplex::TiLim, 3600);
 }
 
+
 void tcbvrp_ILP::modelSCF()
 {
+  // our variables are indexed x[k][i][j]
+  // where k is the tour, i the start node, 
+  // j the target node and x the flow from i 
+  // to j in tour k.
+  
+  // multi dimensional IloArrays are possible,
+  // but complicated, so a flat index seems
+  // easier.
+  IloIntVarArray flow(env, n * n * m);
+  
+  // x is a corresponding array for the costs
+  // if flow[k,i,j] > 0 -> x[k,i,j] = t[i,j]
+  IloIntVarArray x(env, n * n * m);
+
+  // cost function
+  IloExpr totalCosts(env);
+
+  // initialize variables and cost function  
+  for (u_int i=0; i<n; i++) 
+    {
+      for (u_int j=0; j<n; j++) 
+	{
+	  for (u_int k=0; k<m; k++)
+	    {
+	      stringstream flowname;
+	      flowname << "f_" << i+1 << "_" << j+1 << "_" << k+1;
+	      stringstream xname;
+	      xname << "x_" << i+1 << "_" << j+1 << "_" << k+1;
+
+	      flow[index3(i,j,k)] = IloIntVar(env, 0, n-1, flowname.str().c_str());
+
+	      //	      IloIntArray xvalues(env, 2);
+	      //	      xvalues[0] = 0;
+	      //	      xvalues[1] = instance.getDistance(i, j);
+	      //	      x[index3(i,j,k)] = IloIntVar(env, xvalues, xname.str().c_str());
+
+	      totalCosts += flow[index3(i,j,k)];
+	    }
+	}
+    }
+
+  model.add(IloMinimize(env, totalCosts));
+ 
+  // totalCosts.end();
+
 	//++++++++++++++++++++++++++++++++++++++++++
 	//TODO build single commodity flow model
 	//++++++++++++++++++++++++++++++++++++++++++
