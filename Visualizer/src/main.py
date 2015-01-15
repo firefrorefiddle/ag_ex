@@ -11,7 +11,10 @@ from Tools import Helper
 
 def main(argv):
     sys.path.insert(1,'/usr/local/bin/')
-    fileLocation = '../../instances/tcbvrp_180_1_T720_m10.prob'
+    if len(argv) > 1:
+        fileLocation = argv[1]
+    else:
+        fileLocation = '../../instances/tcbvrp_180_1_T720_m10.prob'
     g = Helper.Parse(fileLocation)
     Helper.ShowIt(g)
 
