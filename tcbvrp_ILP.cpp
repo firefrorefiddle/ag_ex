@@ -40,7 +40,7 @@ void tcbvrp_ILP::solve()
 		cplex = IloCplex( model );
 
 		// export model to a text file
-		//cplex.exportModel( "model.lp" );
+		cplex.exportModel( "model.lp" );
 
 		// set parameters
 		setCPLEXParameters();
