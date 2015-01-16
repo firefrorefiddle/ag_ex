@@ -81,6 +81,22 @@ public:
 		return false;
 	}
 
+	std::vector<int>::const_iterator beginDemandNodes() {
+	  return demandNodes.cbegin();
+	}
+
+	std::vector<int>::const_iterator endDemandNodes() {
+	  return demandNodes.cend();
+	}
+
+	std::vector<int>::const_iterator beginSupplyNodes() {
+	  return supplyNodes.cbegin();
+	}
+
+	std::vector<int>::const_iterator endSupplyNodes() {
+	  return supplyNodes.cend();
+	}
+
 };
 
 #endif //__INSTANCE__H__

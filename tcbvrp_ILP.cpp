@@ -1,5 +1,8 @@
 #include "tcbvrp_ILP.h"
 
+#include <vector>
+#include <fstream>
+
 tcbvrp_ILP::tcbvrp_ILP( Instance& _instance, string _model_type) :
 instance( _instance ), model_type( _model_type )
 {
@@ -11,6 +14,8 @@ instance( _instance ), model_type( _model_type )
 	m = instance.m;
 	//Max. time limit
 	T = instance.T;
+	// the basic variables
+	x = IloIntVarArray(env, n * n * m);
 }
 
 tcbvrp_ILP::~tcbvrp_ILP()
@@ -54,9 +59,32 @@ void tcbvrp_ILP::solve()
 		cout << "Objective value: " << cplex.getObjValue() << "\n";
 		cout << "CPU time: " << Tools::CPUtime() << "\n\n";
 
-		if( false ) {
-			// TODO optionally output the values of the variables
-		}
+		if( true ) 
+		  {
+		    ofstream outfile("values.lp");
+		    IloNumArray values(env); // , x.getSize());
+		    cplex.getValues(values, x);
+
+		    for (u_int k=0; k<m; k++)
+		      {
+			outfile << " *** Tour *** " << k << ":" << endl;
+
+			for (u_int i=0; i<n; i++) 
+			  {
+			    for (u_int j=0; j<n; j++) 
+			      {			       
+				outfile << values[index3(i,j,k)] << " ";
+			      }
+			    outfile << endl;
+			  }
+
+			outfile << endl << endl;
+		      }
+
+		    outfile << "Costs: " << cplex.getObjValue() << endl;
+
+		    outfile.close();
+		  }
 	}
 	catch( IloException& e ) {
 		cerr << "tcbvrp_ILP: exception " << e << "\n";
@@ -86,7 +114,6 @@ void tcbvrp_ILP::setCPLEXParameters()
 	cplex.setParam( IloCplex::TiLim, 3600);
 }
 
-
 void tcbvrp_ILP::modelSCF()
 {
   // our variables are indexed x[k][i][j]
@@ -97,46 +124,76 @@ void tcbvrp_ILP::modelSCF()
   // multi dimensional IloArrays are possible,
   // but complicated, so a flat index seems
   // easier.
-  IloIntVarArray flow(env, n * n * m);
+  //  IloIntVarArray flow(env, n * n * m);
   
-  // x is a corresponding array for the costs
-  // if flow[k,i,j] > 0 -> x[k,i,j] = t[i,j]
-  IloIntVarArray x(env, n * n * m);
-
   // cost function
   IloExpr totalCosts(env);
 
-  // initialize variables and cost function  
+  // *** initialize variables and cost function  ***
   for (u_int i=0; i<n; i++) 
     {
       for (u_int j=0; j<n; j++) 
 	{
 	  for (u_int k=0; k<m; k++)
 	    {
-	      stringstream flowname;
-	      flowname << "f_" << i+1 << "_" << j+1 << "_" << k+1;
+	      //	      stringstream flowname;
+	      //	      flowname << "f_" << i+1 << "_" << j+1 << "_" << k+1;
 	      stringstream xname;
 	      xname << "x_" << i+1 << "_" << j+1 << "_" << k+1;
 
-	      flow[index3(i,j,k)] = IloIntVar(env, 0, n-1, flowname.str().c_str());
+	      //	      flow[index3(i,j,k)] = IloIntVar(env, 0, n-1, flowname.str().c_str());
+	      x[index3(i,j,k)] = IloIntVar(env, 0, 1, xname.str().c_str());
 
-	      //	      IloIntArray xvalues(env, 2);
-	      //	      xvalues[0] = 0;
-	      //	      xvalues[1] = instance.getDistance(i, j);
-	      //	      x[index3(i,j,k)] = IloIntVar(env, xvalues, xname.str().c_str());
-
-	      totalCosts += flow[index3(i,j,k)];
+	      totalCosts += (x[index3(i,j,k)] * instance.getDistance(i,j));
 	    }
 	}
     }
 
+  model.add(x);
   model.add(IloMinimize(env, totalCosts));
  
-  // totalCosts.end();
+  // *** add constraints ***
 
-	//++++++++++++++++++++++++++++++++++++++++++
-	//TODO build single commodity flow model
-	//++++++++++++++++++++++++++++++++++++++++++
+  // Sum_im x_mij = 1 forall j in D
+  //   i.e. each demand node is visited exactly once
+  
+  IloArray<IloExpr> eachDemandOnce(env, n);
+
+  for(vector<int>::const_iterator iter = instance.beginDemandNodes();
+      iter != instance.endDemandNodes();
+      ++iter)
+    {
+      eachDemandOnce[*iter-1] = IloExpr(env);
+      for(u_int i=0; i<n; ++i)
+	{
+	  for(u_int k=0; k<m; ++k)
+	    {
+	      eachDemandOnce[*iter-1] += x[index3(i,*iter-1,k)];
+	    }
+	}
+      model.add(eachDemandOnce[*iter-1] == 1);
+    }
+
+  // Sum_im x_mij <= 1 forall j in S
+  //   i.e. each supply node is visited at most once
+
+  IloArray<IloExpr> eachSupplyOnce(env, n);
+
+  for(vector<int>::const_iterator iter = instance.beginSupplyNodes();
+      iter != instance.endSupplyNodes();
+      ++iter)
+    {
+      eachSupplyOnce[*iter-1] = IloExpr(env);
+      for(u_int i=0; i<n; ++i)
+	{
+	  for(u_int k=0; k<m; ++k)
+	    {
+	      eachSupplyOnce[*iter-1] += x[index3(i,*iter-1,k)];
+	    }
+	}
+      model.add(eachSupplyOnce[*iter-1] <= 1);
+    }
+
 }
 
 void tcbvrp_ILP::modelMCF()

@@ -24,6 +24,8 @@ private:
 	unsigned int m; // Number of Vehicles
 	unsigned int T; // Time budget
 
+	IloIntVarArray x;
+
 	IloEnv env;
 	IloModel model;
 	IloCplex cplex;
