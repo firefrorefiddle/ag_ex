@@ -1,0 +1,48 @@
+#!/bin/sh
+
+version=`astyle --version 2> /dev/null`
+if test "x$version" != "x"; then
+echo "SDF3 git pre-receive hook:"
+echo "Did not find astyle, please install it before continuing."
+exit 1
+fi
+ASTYLE=astyle
+
+case `$ASTYLE --version 2> /dev/null` in
+  Artistic*)
+      ;;
+  default)
+      echo "SDF3 git pre-commit hook:"
+      echo "Did not find astyle, please install it before continuing."
+      exit 1
+      ;;
+esac
+
+ASTYLE_PARAMETERS="--style=allman \
+    --indent=spaces=4 \
+    --convert-tabs \
+    --indent-classes \
+    --indent-switches \
+    --indent-namespaces \
+    --indent-labels \
+    --indent-col1-comments \
+    --min-conditional-indent=0 \
+    --pad-oper \
+    --pad-header \
+    --unpad-paren \
+    --align-pointer=name \
+    --lineend=linux \
+    --suffix=none"
+
+echo "--Formatting source code--"
+
+files=`git-diff-index --diff-filter=ACMR --name-only -r --cached $against --`
+for file in $files; do
+    x=`echo $file |grep -E '(\.cc|\.h)'`
+    if test "x$x" != "x"; then
+        $ASTYLE ${ASTYLE_PARAMETERS} $file
+        git add $file
+    fi
+done
+
+echo "--Formatting source code done--"
