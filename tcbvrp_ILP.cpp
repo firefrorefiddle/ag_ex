@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <fstream>
+#include <cmath>
 
 tcbvrp_ILP::tcbvrp_ILP( Instance& _instance, string _model_type) :
     instance( _instance ), model_type( _model_type )
@@ -84,7 +85,7 @@ void tcbvrp_ILP::solve()
 
                     for (u_int j=0; j<n; j++)
                     {
-                        int value = values[index3(i,j,k)] * instance.getDistance(i,j);
+                        int value = round(values[index3(i,j,k)]) * instance.getDistance(i,j);
 
                         tourCost += value;
 
@@ -97,8 +98,11 @@ void tcbvrp_ILP::solve()
             }
 
             outfile << "Costs: " << cplex.getObjValue() << endl;
-
             outfile.close();
+
+            ofstream objfile("objective.lp");
+            objfile << cplex.getObjValue() << endl;
+            objfile.close();
         }
     }
     catch( IloException& e ) {
@@ -167,6 +171,9 @@ void tcbvrp_ILP::modelGeneral()
                 max = 1;
                 break;
             case (1 << 3) + (1 << 2): // depot -> supply
+                max = 1;
+                break;
+            case (1 << 3) + 1:        // depot -> depot
                 max = 1;
                 break;
             default:
@@ -282,6 +289,9 @@ void tcbvrp_ILP::modelGeneral()
 
 void tcbvrp_ILP::modelSCF()
 {
+
+    cout << "Using SCF Algorithm" << endl;
+
     modelGeneral();
 
     IloIntVarArray flow(env, n*n*m);
@@ -299,25 +309,25 @@ void tcbvrp_ILP::modelSCF()
         }
     }
 
+    IloExpr sumDepot(env);
+
     for(u_int k=0; k<m; ++k)
     {
         //
         // ** n-1 going out from the depot
         //
-        IloExpr sumDepot(env);
 
         for(u_int j=1; j<n; ++j)
         {
             sumDepot += flow[index3(0,j,k)];
         }
 
-        model.add(sumDepot == n-1);
-
         //
         // ** outgoing flow matches incoming flow
         //
         for(u_int j=1; j<n; j++)
         {
+
             IloIntVar any(env, 0, 1);
 
             IloExpr sumIncoming(env);
@@ -339,7 +349,15 @@ void tcbvrp_ILP::modelSCF()
                 }
             }
 
-            model.add((sumIncoming - sumOutgoing) == any);
+            if(instance.isDemandNode(j))
+            {
+                model.add((sumIncoming - sumOutgoing) == any);
+            }
+            else
+            {
+                model.add((sumIncoming - sumOutgoing) == 0);
+            }
+
         }
 
         //
@@ -356,13 +374,111 @@ void tcbvrp_ILP::modelSCF()
         }
     }
 
+    model.add(sumDepot == instance.nDemandNodes());
+
 }
 
 void tcbvrp_ILP::modelMCF()
 {
-    // ++++++++++++++++++++++++++++++++++++++++++
-    // TODO build multi commodity flow model
-    // ++++++++++++++++++++++++++++++++++++++++++
+    cout << "Using MCF Algorithm" << endl;
+
+    modelGeneral();
+
+    for(u_int c = 0; c < n; c++) {
+
+        if(!instance.isDemandNode(c))
+        {
+            continue;
+        }
+
+        IloIntVarArray flow(env, n*n*m);
+
+        for(u_int i=0; i<n; ++i)
+        {
+            for(u_int j=0; j<n; ++j)
+            {
+                for(u_int k=0; k<m; ++k)
+                {
+                    stringstream flowname;
+                    flowname << "f_" << i << "_" << j << "_" << k;
+                    flow[index3(i,j,k)] = IloIntVar(env, 0, n-1, flowname.str().c_str());
+                }
+            }
+        }
+
+        IloExpr sumDepotOut(env);
+        IloExpr sumDepotIn(env);
+
+        for(u_int k=0; k<m; ++k)
+        {
+            //
+            // ** n-1 going out from the depot
+            //
+
+            for(u_int j=1; j<n; ++j)
+            {
+                sumDepotOut += flow[index3(0,j,k)];
+            }
+
+            for(u_int i=1; i<n; ++i)
+            {
+                sumDepotIn += flow[index3(i,0,k)];
+            }
+
+            //
+            // ** outgoing flow matches incoming flow
+            //
+            for(u_int j=1; j<n; j++)
+            {
+
+                IloIntVar any(env, 0, 1);
+
+                IloExpr sumIncoming(env);
+                for(u_int i=0; i<n; i++)
+                {
+                    if(i != j)
+                    {
+                        sumIncoming += flow[index3(i,j,k)];
+                        model.add(any >= x[index3(i,j,k)]);
+                    }
+                }
+
+                IloExpr sumOutgoing(env);
+                for(u_int l=0; l<n; l++)
+                {
+                    if(j != l)
+                    {
+                        sumOutgoing += flow[index3(j,l,k)];
+                    }
+                }
+
+                if(j == c)
+                {
+                    model.add((sumIncoming - sumOutgoing) == any);
+                }
+                else
+                {
+                    model.add((sumIncoming - sumOutgoing) == 0);
+                }
+
+            }
+
+            //
+            // ** flow at most n-1 or 0
+            //
+            for(u_int i=0; i<n; i++)
+            {
+                for(u_int j=0; j<n; j++)
+                {
+                    if(i==j) continue;
+                    model.add(flow[index3(i,j,k)] >= 0);
+                    model.add(flow[index3(i,j,k)] <= (x[index3(i,j,k)] * ((int) n-1)));
+                }
+            }
+        }
+
+        model.add((sumDepotOut - sumDepotIn) == 1);
+    }
 }
 
 void tcbvrp_ILP::modelMTZ()
