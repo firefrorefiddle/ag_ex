@@ -83,6 +83,10 @@ public:
         return false;
     }
 
+    int nDemandNodes() {
+      return demandNodes.size();
+    }
+
     std::vector<int>::const_iterator beginDemandNodes() {
         return demandNodes.cbegin();
     }
