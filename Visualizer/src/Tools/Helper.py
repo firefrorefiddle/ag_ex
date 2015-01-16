@@ -21,8 +21,11 @@ def ShowIt(g):
             _col.append('red')
     g['node_id'][0] = 'NU'
     
+    for i in range(0, len(g['node_id'])):
+        g['node_id'][i] = i
+    
     G = nx.from_numpy_matrix(_A)
-    nx.draw_spring(G, node_color = _col, with_labels = True, labels = g['node_id'], node_size=500)
+    nx.draw_spring(G, node_color = _col, with_labels = True, labels = g['node_id'] , node_size=600)
     plt.show()
     
     '''_G = nx.from_numpy_matrix(_A)
@@ -51,6 +54,15 @@ def Parse(fileLocation):
         strRest+= lines[i]
               
     nodes = np.fromstring(strRest, dtype=int, sep=' ').reshape((no_nodes+1, no_nodes+1))
+    
+    for i in range (0, len(node_id)):
+        for j in range (0, len(node_id)):
+            if i == j:
+                continue
+            
+            if node_id[i+1] == node_id[j+1]:
+                nodes[i+1][j+1] = 0
+                nodes[j+1][i+1] = 0
     
     obj_return = {}
     obj_return['no_nodes'] = no_nodes
