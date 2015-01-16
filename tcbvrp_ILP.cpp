@@ -67,28 +67,28 @@ void tcbvrp_ILP::solve()
 
             for (u_int k=0; k<m; k++)
             {
-	      int tourCost = 0;
-	      
+                int tourCost = 0;
+
                 outfile << " *** Tour *** " << k << ":" << endl;
 
-		outfile << "   ";
-		for (u_int i=0; i<n; i++)
-		  {
-		    outfile << setw(2) << i << " ";
-		  }
-		outfile << endl;
+                outfile << "   ";
+                for (u_int i=0; i<n; i++)
+                {
+                    outfile << setw(2) << i << " ";
+                }
+                outfile << endl;
 
                 for (u_int i=0; i<n; i++)
                 {
-		  outfile << setw(2) << i << " ";
+                    outfile << setw(2) << i << " ";
 
-		  for (u_int j=0; j<n; j++)
+                    for (u_int j=0; j<n; j++)
                     {
-		      int value = values[index3(i,j,k)] * instance.getDistance(i,j);
+                        int value = values[index3(i,j,k)] * instance.getDistance(i,j);
 
-		      tourCost += value;
+                        tourCost += value;
 
-		      outfile << setw(2) << (value == -0 ? 0 : value) << " ";
+                        outfile << setw(2) << (value == -0 ? 0 : value) << " ";
                     }
                     outfile << endl;
                 }
@@ -226,14 +226,14 @@ void tcbvrp_ILP::modelSCF()
 
     // also visit the depot once each tour
     for(u_int k=0; k<m; ++k)
-      {
-	IloExpr visitDepotOnce(env);
-	for(u_int i=0; i<n; ++i)
-	  {
-	    visitDepotOnce += x[index3(i,0,k)];
-	  }
-	model.add(visitDepotOnce == 1);
-      }
+    {
+        IloExpr visitDepotOnce(env);
+        for(u_int i=0; i<n; ++i)
+        {
+            visitDepotOnce += x[index3(i,0,k)];
+        }
+        model.add(visitDepotOnce == 1);
+    }
 
     // Sum_im x_mij <= 1 forall j in S
     //   i.e. each supply node is visited at most once
@@ -256,39 +256,39 @@ void tcbvrp_ILP::modelSCF()
     }
 
     // Sum_x_mij = Sum_x_mjk forall mj
-    
-    for(u_int j=0; j<n; ++j) 
-      {
-	for(u_int k=0; k<m; ++k)
-	  {
-	    IloExpr incomingConnections(env);
 
-	    for(u_int i=0; i<n; ++i)
-	      {
-		incomingConnections += x[index3(i,j,k)];
-	      }
+    for(u_int j=0; j<n; ++j)
+    {
+        for(u_int k=0; k<m; ++k)
+        {
+            IloExpr incomingConnections(env);
 
-	    IloExpr outgoingConnections(env);	
-	    
-	    for(u_int l=0; l<n; ++l)
-	      {
-		outgoingConnections += x[index3(j,l,k)];
-	      }
+            for(u_int i=0; i<n; ++i)
+            {
+                incomingConnections += x[index3(i,j,k)];
+            }
 
-	    model.add(incomingConnections == outgoingConnections);	
-	  }
-      }
-   
+            IloExpr outgoingConnections(env);
+
+            for(u_int l=0; l<n; ++l)
+            {
+                outgoingConnections += x[index3(j,l,k)];
+            }
+
+            model.add(incomingConnections == outgoingConnections);
+        }
+    }
+
     // Sum_x_mij <= t forall m
     //  i.e. restrict length of each subtour
     for(u_int k=0; k<m; ++k) {
-      IloExpr tourLength(env);
-      for(u_int i=0; i<n; ++i) {
-	for(u_int j=0; j<n; ++j) {
-	  tourLength += x[index3(i,j,k)];
-	}
-      }
-      model.add(tourLength <= (int)T);	
+        IloExpr tourLength(env);
+        for(u_int i=0; i<n; ++i) {
+            for(u_int j=0; j<n; ++j) {
+                tourLength += x[index3(i,j,k)];
+            }
+        }
+        model.add(tourLength <= (int)T);
     }
 
 }
