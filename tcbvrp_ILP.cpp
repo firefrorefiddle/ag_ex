@@ -131,15 +131,6 @@ void tcbvrp_ILP::setCPLEXParameters()
 
 void tcbvrp_ILP::modelGeneral()
 {
-    // our variables are indexed x[k][i][j]
-    // where k is the tour, i the start node,
-    // j the target node and x the flow from i
-    // to j in tour k.
-
-    // multi dimensional IloArrays are possible,
-    // but complicated, so a flat index seems
-    // easier.
-    //  IloIntVarArray flow(env, n * n * m);
 
     // cost function
     IloExpr totalCosts(env);
@@ -280,9 +271,10 @@ void tcbvrp_ILP::modelGeneral()
         IloExpr tourLength(env);
         for(u_int i=0; i<n; ++i) {
             for(u_int j=0; j<n; ++j) {
-                tourLength += x[index3(i,j,k)];
+                tourLength += (x[index3(i,j,k)] * instance.getDistance(i,j));
             }
         }
+
         model.add(tourLength <= (int)T);
     }
 
@@ -326,12 +318,15 @@ void tcbvrp_ILP::modelSCF()
         //
         for(u_int j=1; j<n; j++)
         {
+            IloIntVar any(env, 0, 1);
+
             IloExpr sumIncoming(env);
             for(u_int i=0; i<n; i++)
             {
                 if(i != j)
                 {
                     sumIncoming += flow[index3(i,j,k)];
+                    model.add(any >= x[index3(i,j,k)]);
                 }
             }
 
@@ -344,7 +339,7 @@ void tcbvrp_ILP::modelSCF()
                 }
             }
 
-            model.add((sumIncoming - sumOutgoing) == 1);
+            model.add((sumIncoming - sumOutgoing) == any);
         }
 
         //
