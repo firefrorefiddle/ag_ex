@@ -134,7 +134,36 @@ void tcbvrp_ILP::modelSCF()
     {
         for (u_int j=0; j<n; j++)
         {
-            for (u_int k=0; k<m; k++)
+
+	  // if this is not an allowed arc, then we will just give 0 as a maximum
+	  // var value
+	  
+	  // how UGLY! go replace it with something nicer...!
+	  int iSupply = instance.isSupplyNode(i+1);
+	  int iDemand = instance.isDemandNode(i+1);
+	  int iDepot  = (iSupply + iDemand) == 0 ? 1 : 0;
+	  int jSupply = instance.isSupplyNode(j+1);
+	  int jDemand = instance.isDemandNode(j+1);
+	  int jDepot  = (jSupply + jDemand) == 0 ? 1 : 0;
+
+	  int max;
+	  
+	  switch((iSupply << 5) + (iDemand << 4) + (iDepot << 3) + 
+		 (jSupply << 2) + (jDemand << 1) + jDepot) 
+	    {
+	    case (1 << 5) + (1 << 1): // supply -> demand
+	      max = 1; break;
+	    case (1 << 4) + (1 << 2): // demand -> supply
+	      max = 1; break;
+	    case (1 << 4) + 1:        // demand -> depot
+	      max = 1; break;
+	    case (1 << 3) + (1 << 2): // depot -> supply
+	      max = 1; break;
+	    default:
+	      max = 0;	     
+	    }
+
+	  for (u_int k=0; k<m; k++)
             {
                 //	      stringstream flowname;
                 //	      flowname << "f_" << i+1 << "_" << j+1 << "_" << k+1;
@@ -142,7 +171,9 @@ void tcbvrp_ILP::modelSCF()
                 xname << "x_" << i+1 << "_" << j+1 << "_" << k+1;
 
                 //	      flow[index3(i,j,k)] = IloIntVar(env, 0, n-1, flowname.str().c_str());
-                x[index3(i,j,k)] = IloIntVar(env, 0, 1, xname.str().c_str());
+
+		
+           x[index3(i,j,k)]= IloIntVar(env, 0, max, xname.str().c_str());
 
                 totalCosts += (x[index3(i,j,k)] * instance.getDistance(i,j));
             }
