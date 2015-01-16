@@ -33,6 +33,7 @@ private:
 	void initCPLEX();
 	void setCPLEXParameters();
 
+	void modelGeneral();
 	void modelSCF();
 	void modelMCF();
 	void modelMTZ();

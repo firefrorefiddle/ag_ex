@@ -129,7 +129,7 @@ void tcbvrp_ILP::setCPLEXParameters()
     cplex.setParam( IloCplex::TiLim, 3600);
 }
 
-void tcbvrp_ILP::modelSCF()
+void tcbvrp_ILP::modelGeneral()
 {
     // our variables are indexed x[k][i][j]
     // where k is the tour, i the start node,
@@ -184,13 +184,8 @@ void tcbvrp_ILP::modelSCF()
 
             for (u_int k=0; k<m; k++)
             {
-                //	      stringstream flowname;
-                //	      flowname << "f_" << i << "_" << j << "_" << k;
                 stringstream xname;
                 xname << "x_" << i << "_" << j << "_" << k;
-
-                //	      flow[index3(i,j,k)] = IloIntVar(env, 0, n, flowname.str().c_str());
-
 
                 x[index3(i,j,k)]= IloIntVar(env, 0, max, xname.str().c_str());
 
@@ -289,6 +284,81 @@ void tcbvrp_ILP::modelSCF()
             }
         }
         model.add(tourLength <= (int)T);
+    }
+
+}
+
+void tcbvrp_ILP::modelSCF()
+{
+    modelGeneral();
+
+    IloIntVarArray flow(env, n*n*m);
+
+    for(u_int i=0; i<n; ++i)
+    {
+        for(u_int j=0; j<n; ++j)
+        {
+            for(u_int k=0; k<m; ++k)
+            {
+                stringstream flowname;
+                flowname << "f_" << i << "_" << j << "_" << k;
+                flow[index3(i,j,k)] = IloIntVar(env, 0, n-1, flowname.str().c_str());
+            }
+        }
+    }
+
+    for(u_int k=0; k<m; ++k)
+    {
+        //
+        // ** n-1 going out from the depot
+        //
+        IloExpr sumDepot(env);
+
+        for(u_int j=1; j<n; ++j)
+        {
+            sumDepot += flow[index3(0,j,k)];
+        }
+
+        model.add(sumDepot == n-1);
+
+        //
+        // ** outgoing flow matches incoming flow
+        //
+        for(u_int j=1; j<n; j++)
+        {
+            IloExpr sumIncoming(env);
+            for(u_int i=0; i<n; i++)
+            {
+                if(i != j)
+                {
+                    sumIncoming += flow[index3(i,j,k)];
+                }
+            }
+
+            IloExpr sumOutgoing(env);
+            for(u_int l=0; l<n; l++)
+            {
+                if(j != l)
+                {
+                    sumOutgoing += flow[index3(j,l,k)];
+                }
+            }
+
+            model.add((sumIncoming - sumOutgoing) == 1);
+        }
+
+        //
+        // ** flow at most n-1 or 0
+        //
+        for(u_int i=0; i<n; i++)
+        {
+            for(u_int j=0; j<n; j++)
+            {
+                if(i==j) continue;
+                model.add(flow[index3(i,j,k)] >= 0);
+                model.add(flow[index3(i,j,k)] <= (x[index3(i,j,k)] * ((int) n-1)));
+            }
+        }
     }
 
 }

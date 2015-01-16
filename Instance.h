@@ -16,86 +16,88 @@ using namespace std;
 class Instance {
 
 private:
-	// travel times between nodes
-	std::vector<double> t;
+    // travel times between nodes
+    std::vector<double> t;
 
-	// store supply and demand nodes separately
-	std::vector<int> supplyNodes;
-	std::vector<int> demandNodes;
+    // store supply and demand nodes separately
+    std::vector<int> supplyNodes;
+    std::vector<int> demandNodes;
 
 public:
 
-	// total number of nodes (depot plus stations)
-	int n;
+    // total number of nodes (depot plus stations)
+    int n;
 
-	// time limit (per vehicle)
-	int T;
+    // time limit (per vehicle)
+    int T;
 
-	/// number of vehicles
-	int m;
+    /// number of vehicles
+    int m;
 
-	// get distance between two nodes
-	double getDistance(int i, int j) { return t[(i*n+j)]; };
-
-
-	struct Arc
-	{
-		unsigned int v1, v2; //arc from v1 to v2
-		int weight;
-	};
-
-	// arc variables
-	unsigned int nArcs;
-	// array of edges
-	vector<Arc> arcs;
-	// incident edges denoted by index in vector <edges>
-	vector<list<unsigned int> > incidentArcs;
+    // get distance between two nodes
+    double getDistance(int i, int j) {
+        return t[(i*n+j)];
+    };
 
 
-	// loads TCBVRP instance in the specified filename.
-	void initialize( const std::string &fname );
+    struct Arc
+    {
+        unsigned int v1, v2; //arc from v1 to v2
+        int weight;
+    };
 
-	//Constructor
-	Instance( const std::string &fname) {
-		initialize(fname);
-	};
+    // arc variables
+    unsigned int nArcs;
+    // array of edges
+    vector<Arc> arcs;
+    // incident edges denoted by index in vector <edges>
+    vector<list<unsigned int> > incidentArcs;
 
-	//standard constructor, initialize must be called
-	Instance() {};
 
-	// Returns true if node s is a supply node
-	bool isSupplyNode(int s) {
-		for (uint i = 0; i < supplyNodes.size(); i++) {
-			if (supplyNodes[i] == s)
-				return true;
-		}
-		return false;
-	}
+    // loads TCBVRP instance in the specified filename.
+    void initialize( const std::string &fname );
 
-	// Returns true if node s is a demand node
-	bool isDemandNode(int s){
-		for (uint i = 0; i < demandNodes.size(); i++) {
-			if (demandNodes[i] == s)
-				return true;
-		}
-		return false;
-	}
+    //Constructor
+    Instance( const std::string &fname) {
+        initialize(fname);
+    };
 
-	std::vector<int>::const_iterator beginDemandNodes() {
-	  return demandNodes.cbegin();
-	}
+    //standard constructor, initialize must be called
+    Instance() {};
 
-	std::vector<int>::const_iterator endDemandNodes() {
-	  return demandNodes.cend();
-	}
+    // Returns true if node s is a supply node
+    bool isSupplyNode(int s) {
+        for (uint i = 0; i < supplyNodes.size(); i++) {
+            if (supplyNodes[i] == s)
+                return true;
+        }
+        return false;
+    }
 
-	std::vector<int>::const_iterator beginSupplyNodes() {
-	  return supplyNodes.cbegin();
-	}
+    // Returns true if node s is a demand node
+    bool isDemandNode(int s) {
+        for (uint i = 0; i < demandNodes.size(); i++) {
+            if (demandNodes[i] == s)
+                return true;
+        }
+        return false;
+    }
 
-	std::vector<int>::const_iterator endSupplyNodes() {
-	  return supplyNodes.cend();
-	}
+    std::vector<int>::const_iterator beginDemandNodes() {
+        return demandNodes.cbegin();
+    }
+
+    std::vector<int>::const_iterator endDemandNodes() {
+        return demandNodes.cend();
+    }
+
+    std::vector<int>::const_iterator beginSupplyNodes() {
+        return supplyNodes.cbegin();
+    }
+
+    std::vector<int>::const_iterator endSupplyNodes() {
+        return supplyNodes.cend();
+    }
 
 };
 
