@@ -1,8 +1,8 @@
-\begin{filecontents*}{results.csv}
-\end{filecontents*}
 
-\begin{tabular}{l|l}%
-    \bfseries SCF & \bfseries MCF% specify table head
-    \csvreader[head to column names]{Basket_ball.csv}{}% use head of csv as column names
-    {\\\hline\csvcoli&\csvcolii}% specify your coloumns here
-\end{tabular}
+\begin{center}
+\csvreader[tabular=|l|l|l|c|c|c|,
+    table head=\hline Instance & Expected & Reached & SCF (s) & MCF (s) &
+    MTZ (s)\\\hline, late after line=\\\hline]%
+{\resultcsv}
+{\Instance & \Expected & \Reached & \SCF & \MCF & \MTZ}% 
+\end{center} 
