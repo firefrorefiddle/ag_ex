@@ -1,0 +1,8 @@
+\begin{filecontents*}{results.csv}
+\end{filecontents*}
+
+\begin{tabular}{l|l}%
+    \bfseries SCF & \bfseries MCF% specify table head
+    \csvreader[head to column names]{Basket_ball.csv}{}% use head of csv as column names
+    {\\\hline\csvcoli&\csvcolii}% specify your coloumns here
+\end{tabular}
