@@ -375,7 +375,7 @@ void tcbvrp_ILP::modelSCF()
             {
                 if (i == j) continue;
                 model.add(flow[index3(i, j, k)] >= 0);
-                model.add(flow[index3(i, j, k)] <= (x[index3(i, j, k)] * ((int) n - 1)));
+                model.add(flow[index3(i, j, k)] <= (x[index3(i, j, k)] * ((int) instance.nDemandNodes())));
             }
         }
     }
