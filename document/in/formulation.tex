@@ -11,31 +11,77 @@ different flow control methods, single commodity flows, multi commodity flows
 and Miller-Tucker-Zemlin subtour elimination constraints which are used to
 eliminate subtours from our solutions.
 
-The very first thing which is mandatory is an objective function that can be
-optimized. Here it is proposed to try to minimize following function as our
+Starting with the standard TSP formulation, we have to adjust it a little to 
+account for the extra properties in TCBVRP. Our basic variables are not
+indexed $x_{ij}$ as in two dimensions, but $x_{ijk}$ where $k$ is the number
+of the tour. So we need $n*n*m$ variables instead of just $n*n$, and $x_{ijk} \in \{0,1\}$
+indicates whether the arch from $i$ to $j$ was taken in tour $k$ (then $x_{ijk} = 1$) or
+not ($x_{ijk} = 0$).
+
+After declaring the variables, the next thing which is mandatory is an objective function 
+that can be optimized. Here it is proposed to try to minimize following function as our
 objective function:
 
-\begin{center}
+\begin{equation}
+\mbox{minimize }\sum_{k = 1}^{m} \sum_{i = 0}^{n} \sum_{j = 0}^{n} c_{ij} x_{ijk}
+\end{equation}
 
-\texttt{minimize }$\sum_{k = 1}^{m} \sum_{i = 0}^{n} \sum_{j = 0}^{n}
-C_{ijm} X_{ijm}$
-
-\end{center}
-
-While $X_{ijm}$ defines connectivity between each pair of nodes $(i,j)$ in
-$m-$th tour, $C_{ijm}$ brings the cost of this connection into our objective
-function.
+Where $c_{ij}$ designates the cost of the connection $ij$.
 
 Now since the objective function is declared, so the constraint must be defined
 as well. Let's start with the requirements listed before and formulate them one
 by one.
 
-\begin{enumerate}
-  \item .
-  \item .
-  \item .
-  \item .
-  \item .
-  \item .
-  \item .
-\end{enumerate}
+The basic constraints are the same for all three formulations. $D$ denotes the
+set of demand nodes, $S$ the set of supply nodes. If not otherwise designated,
+then $i, j \in N$ and $k \in M$. We designate the depot as node $0$.
+
+\begin{description}
+  \item[Each demand node is visited exactly once.]
+    \begin{equation}
+      \forall j \in D. \sum_{i,i \neq j, k} x_{ijk} = 1
+    \end{equation}
+  \item[Each supply node is visited at most once.]
+    \begin{equation}
+      \forall j \in S. \sum_{i,i \neq j, k} x_{ijk} \leq 1
+    \end{equation}
+  \item[Each node is left as often as it is visited.]
+    \begin{equation}
+      \forall j \in N. \forall k \in M. \sum_{i,i \neq j} x_{ijk} = \sum_{l \in N, l \neq j} x_{jlk}
+    \end{equation}
+    This formulation also ensures that a certain node is visited
+    and left in the same tour. If we had just mimicked the two 
+    preceding constraints for outgoing connections as well,
+    then it would be possible to visit a node in one tour
+    and leave it in the other.        
+  \item[The depot is visited once in each tour.]
+    \begin{equation}
+      \forall k. \sum_{i} x_{i,0,k} = 1
+    \end{equation}
+  \item[Each connection is either taken or not.]
+    \begin{equation}
+        \forall i,j \in N. \forall k \in M. \begin{cases} 
+          &x_{ijk} \in \{0,1\} \mbox{ iff. $ij$ allowed} \\
+          &x_{ijk} = 0 \mbox{ otherwise}
+      \end{cases}
+    \end{equation}
+    Allowed connections are those allowed in TCBVRP, e.g.
+    \begin{itemize}
+      \item $Supply \rightarrow Demand$
+      \item $Demand \rightarrow Supply$
+      \item $Demand \rightarrow Depot$
+      \item $Depot \rightarrow Supply$
+      \item $Depot \rightarrow Depot$
+    \end{itemize}
+
+    Note that $Depot \rightarrow Depot$ is allowed, thus making empty tours possible. 
+    This means that there is intentionally no $i \neq j$  property in the above 
+    formula while it is present in the formulation
+    of the original TSP problem. All other self-connections are forbidden by the 
+    $allowed$ rule above though.
+
+  \item[No subtour can be longer than $T$.]
+    \begin{equation}
+      \forall k. \sum_{i} \sum_{j} x_{ijk} c_{ij} \leq T
+    \end{equation}
+\end{description}
