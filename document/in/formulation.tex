@@ -1,0 +1,41 @@
+Moving toward the ultimate goal of finding an optimal solution for the problem
+stated before, the first step is to formulate this problem is a way solvable by
+integer programming. Subsequently these formulae can be easily structured and
+implemented such that available integer programming solvers can be utilized to
+find our required answer. Here as suggested by course instructors, CPLEX solver
+is used to find the proper answer to a mixed integer linear program created and
+formulated out of requirements of mentioned problem.
+
+Short after formulating the problem, the implementation is given based on three
+different flow control methods, single commodity flows, multi commodity flows
+and Miller-Tucker-Zemlin subtour elimination constraints which are used to
+eliminate subtours from our solutions.
+
+The very first thing which is mandatory is an objective function that can be
+optimized. Here it is proposed to try to minimize following function as our
+objective function:
+
+\begin{center}
+
+\texttt{minimize }$\sum_{k = 1}^{m} \sum_{i = 0}^{n} \sum_{j = 0}^{n}
+C_{ijm} X_{ijm}$
+
+\end{center}
+
+While $X_{ijm}$ defines connectivity between each pair of nodes $(i,j)$ in
+$m-$th tour, $C_{ijm}$ brings the cost of this connection into our objective
+function.
+
+Now since the objective function is declared, so the constraint must be defined
+as well. Let's start with the requirements listed before and formulate them one
+by one.
+
+\begin{enumerate}
+  \item .
+  \item .
+  \item .
+  \item .
+  \item .
+  \item .
+  \item .
+\end{enumerate}
