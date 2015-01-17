@@ -18,7 +18,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[twocolumn]{article}
+\documentclass[fancy]{article}
 
 \usepackage{lipsum} % Package to generate dummy text throughout this template
 
@@ -35,6 +35,40 @@
 \usepackage{hyperref} % For hyperlinks in the PDF
 \usepackage{authblk}
 \usepackage{amsmath}
+
+\usepackage{color}
+
+\definecolor{pblue}{rgb}{0.13,0.13,1}
+\definecolor{pgreen}{rgb}{0,0.5,0}
+\definecolor{pred}{rgb}{0.9,0,0}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
+
+
+
+\usepackage{listings}
+\lstset{language=C++,
+  showspaces=false,
+  showtabs=false,
+  breaklines=true,
+  showstringspaces=false,
+  breakatwhitespace=true,
+  commentstyle=\color{pgreen},
+  keywordstyle=\color{pblue},
+  stringstyle=\color{pred},
+  basicstyle=\ttfamily,
+  moredelim=[il][\textcolor{pgrey}]{$$},
+  frame = single,
+  numbers=left, 
+  numberstyle=\small,
+  belowskip=3em,
+  aboveskip=2em,
+  moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%}
+}
+
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{beramono}
+\newcommand\Small{\fontsize{9}{9.2}\selectfont}
+\newcommand*\LSTfont{\Small\ttfamily\SetTracking{encoding=*}{-60}\lsstyle}
 
 \usepackage{lipsum}
 \newenvironment{Figure}
@@ -87,13 +121,11 @@
 
 \begin{document}
 
-\twocolumn[%
+
 \maketitle % Insert title
 \begin{abstract}
 \input{abstract}
 \end{abstract}
-]
-
 
 
 \thispagestyle{fancy} % All pages have headers and footers
@@ -112,7 +144,7 @@
 
 
 \smallskip
-\noindent \textbf{Keywords.} Integer Programming, CPLEX, ILOG, Vehicle Routing
+\noindent \textbf{Keywords.} Integer Programming, CPLEX, ILOG, Vehicle Routing,
 Algorithms
 
 
