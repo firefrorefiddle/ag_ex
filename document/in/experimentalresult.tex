@@ -1,8 +1,21 @@
+Following, results achieved by running the algorithms are depicted.
 
 \begin{center}
-\csvreader[tabular=|l|l|l|c|c|c|,
-    table head=\hline Instance & Expected & Reached & SCF (s) & MCF (s) &
-    MTZ (s)\\\hline, late after line=\\\hline]%
-{\resultcsv}
-{\Instance & \Expected & \Reached & \SCF & \MCF & \MTZ}% 
-\end{center} 
+\pgfplotstabletypeset[
+    col sep=comma,
+    string type,
+    every head row/.style={%
+        before row={\hline
+            &&&\multicolumn{3}{c}{Time} \\
+        },
+        after row=\hline
+    },
+    every last row/.style={after row=\hline},
+    columns/Instance/.style={column name=Instance, column type=l},
+    columns/Expected/.style={column name=Expected, column type=c},
+    columns/Reached/.style={column name=Reached, column type=c},
+    columns/SCF/.style={column name=SCF, column type=c},
+    columns/MCF/.style={column name=MCF, column type=c},
+    columns/MTZ/.style={column name=MTZ, column type=c}
+    ]{\resultcsv}
+\end{center}
