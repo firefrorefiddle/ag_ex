@@ -65,7 +65,7 @@ then $i, j \in N$ and $k \in M$. We designate the depot as node $0$.
           &x_{ijk} = 0 \mbox{ otherwise}
       \end{cases}
     \end{equation}
-    Allowed connections are those allowed in TCBVRP, e.g.
+    Allowed connections are those allowed in TCBVRP, i.e.
     \begin{itemize}
       \item $Supply \rightarrow Demand$
       \item $Demand \rightarrow Supply$
@@ -84,4 +84,50 @@ then $i, j \in N$ and $k \in M$. We designate the depot as node $0$.
     \begin{equation}
       \forall k. \sum_{i} \sum_{j} x_{ijk} c_{ij} \leq T
     \end{equation}
+\end{description}
+
+\subsection{Single Commodity Flow}
+
+We need the additional constraints in SCF, MCF and MTZ to avoid subtours. The idea n SCF is
+to send out some commodity from the depot and have each reached node subtract one. Thus, a 
+subtour which does not include the depot is not possible because no flow would be coming in
+and therefore the nodes inside the subtour would have negative flow, which is forbidden.
+
+We introduce a new set of variables $f_{ijk}$, corresponding to $x_{ijk}$ describing the units
+of flow over a certain arch $ij$ in a tour $k$. If $x_{ijk} = 0$, then $f_{ijk} = 0$, too.
+
+\begin{description}
+  \item[The depot sends out $|D|$ units of flow.] $D$ here is the set of demand nodes. We do 
+  not need to send out flow for supply nodes because they do not necessarily have to be
+  reached at all, and they cannot form subtours on their own because it's not allowed to 
+  go from a supply node to anywhere but a demand node.
+     \begin{equation}
+       \sum_{j>0,k} f_{0jk} = D
+     \end{equation}
+
+  \item[A node is either reached in a certain tour or not.]
+     Compared to the standard TSP problem we have to deal with a complication here: A node which 
+     is not reached in a certain tour does not get any flow and therefore cannot subtract one,
+     so we have to distinguish between reached nodes and unreached nodes, giving rise to a new
+     variable $r_{jk} \in \{0,1\}$ and the following constraint.
+     \begin{equation}
+        \forall j>0. \forall i \neq j. \forall k. r_{jk} \geq x_{ijk}
+     \end{equation}
+     This ensures that $r_{jk}$ is $1$ if $j$ is reached, but it cannot also be $1$ if it unreached,
+     because this would mean that $j$ would be forced to subtract a flow unit which it cannot
+     do because there would be no incoming flow.
+
+  \item[A demand node subtracts a unit of flow if it reached in a tour, and passes it on unmodified
+        otherwise.] We can now formulate this crucial property.
+  \begin{equation}
+        \forall j>0 \in D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = r_{jk}
+  \end{equation}
+
+  \item[Any other node passes on flow unmodified.]
+  \begin{equation}
+        \forall j>0, j \in N \setminus D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = 0
+  \end{equation}
+
+  \item[flow is at most $|D|$ or $0$] \textbf{TODO!}
+
 \end{description}
