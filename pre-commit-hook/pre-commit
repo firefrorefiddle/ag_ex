@@ -36,9 +36,9 @@ ASTYLE_PARAMETERS="--style=allman \
 
 echo "--Formatting source code--"
 
-files=`git-diff-index --diff-filter=ACMR --name-only -r --cached $against --`
+files=`git diff-index --abbrev HEAD --diff-filter=ACMR --name-only -r --cached $against --`
 for file in $files; do
-    x=`echo $file |grep -E '(\.cc|\.h)'`
+    x=`echo $file |grep -E '(\.cc|\.cpp|\.h)'`
     if test "x$x" != "x"; then
         $ASTYLE ${ASTYLE_PARAMETERS} $file
         git add $file
