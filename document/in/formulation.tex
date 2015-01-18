@@ -1,8 +1,9 @@
 Moving toward the ultimate goal of finding an optimal solution for the problem
 stated before, the first step is to formulate this problem is a way solvable by
-integer programming. Subsequently these formulae can be easily structured and
-implemented such that available integer programming solvers can be utilized to
-find our required answer. Here as suggested by course instructors, CPLEX solver
+integer programming [\cite{garfinkel1972integer}]. Subsequently these formulae can be easily structured
+and implemented such that available integer programming solvers can be utilized to
+find our required answer. Here as suggested by course instructors, IBM ILOG
+CPLEX Solver [\cite{cplex2009v12}]
 is used to find the proper answer to a mixed integer linear program created and
 formulated out of requirements of mentioned problem.
 
@@ -11,8 +12,8 @@ different flow control methods, single commodity flows, multi commodity flows
 and Miller-Tucker-Zemlin subtour elimination constraints which are used to
 eliminate subtours from our solutions.
 
-Starting with the standard TSP formulation, we have to adjust it a little to 
-account for the extra properties in TCBVRP. Our basic variables are not
+Starting with the standard TSP [\cite{miller1960integer}] formulation, we have to adjust it a
+little to account for the extra properties in TCBVRP. Our basic variables are not
 indexed $x_{ij}$ as in two dimensions, but $x_{ijk}$ where $k$ is the number
 of the tour. So we need $n*n*m$ variables instead of just $n*n$, and $x_{ijk} \in \{0,1\}$
 indicates whether the arch from $i$ to $j$ was taken in tour $k$ (then $x_{ijk} = 1$) or

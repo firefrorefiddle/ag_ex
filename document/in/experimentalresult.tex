@@ -1,34 +1,123 @@
-Following, results achieved by running the algorithms are depicted in
-Table\ref{tab:results}.
-Every instance is tested once with each subtour termination algorithm. Apparently the
-algorithms are capable of reaching the correct answer for every instance and it
-is only running time that makes it hard to get the final result for larger
-inputs.
+In this section, the results achieved by running the algorithms are depicted in
+Tables\ref{tab:scf}, \ref{tab:mcf} and \ref{tab:mtz}.
+In order to test the algorithms, first it is tried to run them on a virtual
+machine. But immediately it turned out that reaching a solution for some of them
+need hours or in some cases maybe weeks. Thus the algorithms are let to run
+on the grid\footnote{https://www.ads.tuwien.ac.at/w/Students/Grid\_Engine}
+provided by the course instructors. The results are gathered afterwards and
+below, it can be observed in separate tables based on different subtour
+elimination algorithm.
 
 \begin{center}
-\begin{table}
-\pgfplotstabletypeset[
-    col sep=comma,
-    string type,
-    every head row/.style={%
-        before row={\hline 
-            &\multicolumn{2}{c}{Optimal Cost}&\multicolumn{3}{c}{Time (s)} \\ 
-            \cmidrule(r){2-3}  \cmidrule(r){4-6} 
-        },
-        after row=\hline 
-    },
-    every last row/.style={after row=\bottomrule},
-    columns/Instance/.style={column name=Instance, column type=l},
-    columns/Expected/.style={column name=Expected, column type=c},
-    columns/Reached/.style={column name=Reached, column type=c},
-    columns/SCF/.style={column name=SCF, column type=c},
-    columns/MCF/.style={column name=MCF, column type=c},
-    columns/MTZ/.style={column name=MTZ, column type=c}
-    ]{\resultcsv}
 
-\caption{Final results. Values indicated by {\it NA} are runs stopped after \\
-20 minutes or killed by server.}
-\label{tab:results}
+\begin{center}
+
+%table SCF
+\begin{table}[H]
+    \begin{tabular}{ l c c c c c }
+    \hline
+    &&\multicolumn{2}{c}{Value} && \\
+    \cmidrule(r){3-4}
+    Instance & Status & Expected & Actual & Branch-n-Bound & Time(s) \\ \hline
+    10\_1\_T240\_m2 & Optimal & 347& 347  & 2687 & 1.32 \\ 
+	10\_1\_T480\_m2 & Optimal & 308& 308  & 0 & 0.06 \\ 
+	10\_2\_T240\_m2 & Optimal & 275& 275  & 2679 & 1.41 \\ 
+	10\_2\_T480\_m2 & Optimal & 252& 252  & 0 & 0.19 \\ 
+	20\_1\_T240\_m3 & Optimal & 533& 533  & 2079 & 11.33 \\ 
+	20\_1\_T480\_m2 & Optimal & 517& 517  & 2790 & 8.62 \\ 
+	20\_2\_T240\_m4 & Optimal & 594& 594  & 716 & 16.33 \\ 
+	20\_2\_T480\_m2 & Optimal & 566& 566  & 978 & 6.14 \\ 
+	30\_1\_T240\_m4 & Feasible & 763& 763  & 184326 & 3568.31 \\ 
+	30\_1\_T480\_m2 & Optimal & 717& 717  & 8061 & 74.89 \\ 
+	30\_2\_T240\_m4 & Optimal & 896& 896  & 10379 & 350.66 \\ 
+	30\_2\_T480\_m2 & Optimal & 852& 852  & 557 & 14.54 \\ 
+	60\_1\_T360\_m6 & Unknown & 1699& NA &  4586 & NA \\ 
+	60\_1\_T480\_m4 & {\bf Feasible} & 1671& {\bf 1727}$\uparrow$  & 13629 &
+	3594.49
+	\\
+	90\_1\_T480\_m8 & Unknown & 2031& NA &  295 & NA \\ 
+	120\_1\_T480\_m8 & Unknown & 2663& NA & 1 & NA \\ 
+	180\_1\_T720\_m10 & Unknown & 5782& NA & 0 & NA \\
+    \hline
+    \end{tabular}
+    \caption{\label{tab:scf} Results for Single Commodity Flows. Instances
+    having {\it NA} are decided as infeasible. \\ These cases can be
+    distinguished by their status, Unknown.
+    }
 \end{table}
+
+%table MCF
+\begin{table}[H]
+    \begin{tabular}{ l c c c c c }
+    \hline
+    &&\multicolumn{2}{c}{Value} && \\
+    \cmidrule(r){3-4}
+    Instance & Status & Expected & Actual & Branch-n-Bound & Time(s) \\ \hline
+    10\_1\_T240\_m2 & Optimal & 347& 347 & 1138 & 1.63 \\
+	10\_1\_T480\_m2 & Optimal & 308& 308 & 0 & 0.17 \\
+	10\_2\_T240\_m2 & Optimal & 275& 275 & 1308 & 1.74 \\
+	10\_2\_T480\_m2 & Optimal & 252& 252 & 47 & 0.19 \\
+	20\_1\_T240\_m3 & Optimal & 533& 533 & 529 & 37.14 \\
+	20\_1\_T480\_m2 & Optimal & 517 & 517 & 487 & 13.55 \\
+	20\_2\_T240\_m4 & Optimal & 594& 594 & 5641 & 1185.74 \\
+	20\_2\_T480\_m2 & Optimal & 566& 566 & 1087 & 118.85 \\
+	30\_1\_T240\_m4 & {\bf Feasible} & 763& {\bf 787}$\uparrow$ & 5918 & 3591.78
+	\\
+	30\_1\_T480\_m2 & {\bf Feasible} & 717& {\bf 723}$\uparrow$ & 19472 & 3589.55
+	\\
+	30\_2\_T240\_m4 & Unknown & 896& NA & 6672 & NA \\
+	30\_2\_T480\_m2 & Optimal & 852& 852 & 497 & 132.2 \\
+	60\_1\_T360\_m6 & Unknown & 1699& NA  & 0 & NA \\
+	60\_1\_T480\_m4 & Unknown & 1671& NA & 0 & NA \\
+	90\_1\_T480\_m8 & Unknown & 2031& NA & 0 & NA \\
+	120\_1\_T480\_m8 & Unknown & 2663& NA  & 0 & NA \\
+	180\_1\_T720\_m10 & Terminated & 5782 & - & - & - \\
+    \hline
+    \end{tabular}
+    \caption{\label{tab:mcf} Results for Multi Commodity Flows. Instances
+    having {\it NA} are decided as infeasible. \\ These cases can be
+    distinguished by their status, Unknown. 
+    The
+    algorithm with the last\\
+    instance is terminated by the grid for no obvious reason.}
+    
+\end{table}
+
+%table 
+\begin{table}[H]
+    \begin{tabular}{ l c c c c c }
+    \hline
+    &&\multicolumn{2}{c}{Value} && \\
+    \cmidrule(r){3-4}
+    Instance & Status & Expected & Actual & Branch-n-Bound & Time(s) \\ \hline
+    10\_1\_T240\_m2 & Optimal & 347& 347 & 11817 & 6.25 \\
+	10\_1\_T480\_m2 & Optimal & 308& 308 & 4000 & 2.24 \\
+	10\_2\_T240\_m2 & Optimal & 275 & 275 & 17125 & 8.98 \\
+	10\_2\_T480\_m2 & Optimal & 252 & 252 & 7475 & 3.63 \\
+	20\_1\_T240\_m3 & Feasible & 533 & 533 & 2223776 & 3571.54 \\
+	20\_1\_T480\_m2 & Feasible & 517 & 517 & 4195314 & 3548.78 \\
+	20\_2\_T240\_m4 & Feasible & 594 & 594 & 1760396 & 3577.68 \\
+	20\_2\_T480\_m2 & Feasible & 566 & 566 & 3943197 & 3550.43 \\
+	30\_1\_T240\_m4 & Feasible & 763 & 763 & 964139 & 3570.85 \\
+	30\_1\_T480\_m2 & {\bf Feasible} & 717 & {\bf 720}$\uparrow$ & 3007059 &
+	3536.44 \\
+	30\_2\_T240\_m4 & {\bf Feasible} & 896 & {\bf 902}$\uparrow$ & 374437 & 3577.88
+	\\
+	30\_2\_T480\_m2 & {\bf Feasible} & 852 & {\bf 853}$\uparrow$ & 2561989 &
+	3568.98 \\
+	60\_1\_T360\_m6 & Unknown & 1699 & NA & 11830 & NA \\
+	60\_1\_T480\_m4 & Unknown & 1671 & NA & 40305 & NA \\
+	90\_1\_T480\_m8 & Unknown & 2031 & NA & 1563 & NA \\
+	120\_1\_T480\_m8 & Unknown & 2663 & NA & 2412 & NA \\
+	180\_1\_T720\_m10 & Unknown & 5782 & NA & 50 & NA \\
+
+    \hline
+    \end{tabular}
+    \caption{\label{tab:mtz} Results for Miller-Tucker-Zemlin. Instances
+    having {\it NA} are decided as infeasible. \\ These cases can be
+    distinguished by their status, Unknown. }
+\end{table}
+
+\end{center}
 
 \end{center}
