@@ -48,6 +48,11 @@ private:
 	  return i * n + j;
 	}
 
+	inline int indexnm(int i,int k)
+	{
+	  return i * m + k;
+	}
+
 
 public:
 

@@ -390,6 +390,25 @@ void tcbvrp_ILP::modelMCF()
 
     modelGeneral();
 
+    IloIntVarArray r(env, n*m);
+
+    // take 'any' out of loop
+    for (u_int k=0; k<m; ++k)
+      {
+	for (u_int j = 1; j < n; j++)
+	  {
+	    r[indexnm(j,k)] = IloIntVar(env,0,1);
+
+	    for (u_int i = 0; i < n; i++)
+	      {
+		if (i != j)
+		  {
+		    model.add(r[indexnm(j,k)] >= x[index3(i, j, k)]);
+		  }
+	      }
+	  }
+      }
+
     for (u_int c = 0; c < n; c++)
     {
 
@@ -437,16 +456,13 @@ void tcbvrp_ILP::modelMCF()
             //
             for (u_int j = 1; j < n; j++)
             {
-
-                IloIntVar any(env, 0, 1);
-
                 IloExpr sumIncoming(env);
                 for (u_int i = 0; i < n; i++)
                 {
                     if (i != j)
                     {
                         sumIncoming += flow[index3(i, j, k)];
-                        model.add(any >= x[index3(i, j, k)]);
+                        model.add(r[indexnm(j,k)] >= x[index3(i, j, k)]);
                     }
                 }
 
@@ -461,7 +477,7 @@ void tcbvrp_ILP::modelMCF()
 
                 if (j == c)
                 {
-		  model.add(sumIncoming == any);
+		  model.add(sumIncoming == r[indexnm(j,k)]);
 		  model.add(sumOutgoing == 0);
                 }
                 else

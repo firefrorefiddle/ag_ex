@@ -1,6 +1,7 @@
 #!/bin/bash
 
 instance_dir=instances
+outdir=output
 methods=( "mtz" "scf" "mcf" )
 
 sizes=( 10 20 30 60 90 120 180 )
@@ -24,8 +25,8 @@ do
 		for m in "${ms[@]}"
 		do 
 		    filename="tcbvrp_${size}_${index}_T${limit}_m${m}.prob"
-		    outfile="${filename}_${method}.out"
-		    errfile="${filename}_${method}.err"
+		    outfile="${outdir}/${filename}_${method}.out"
+		    errfile="${outdir}/${filename}_${method}.err"
 
 		    if [ -e "${outfile}" ]
 		    then 

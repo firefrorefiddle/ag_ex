@@ -149,9 +149,12 @@ This is very similar to SCF, but we need $|D|$ times more variables, because we 
        \forall c \in D. \sum_{j>0,k} f_{0jkc} = 1
      \end{equation}
 
-  \item[The depot 
+  \item[There is no flow going back to the depot.]
+     \begin{equation}
+       \forall c \in D. \sum_{i>0,k} f_{i0kc} = 0
+     \end{equation}
 
-  \item[A node is either reached in a certain tour or not.] This is the same as in SCF.
+  \item[A node is either reached in a certain tour or not.]
      \begin{equation}
         \forall j>0. \forall i \neq j. \forall k. r_{jk} \geq x_{ijk}
      \end{equation}
