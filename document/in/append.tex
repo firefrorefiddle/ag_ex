@@ -1,0 +1,49 @@
+\begin{appendices}
+
+
+\begin{lstlisting}[caption=Objective function, label={app:app01}]
+for (u_int i=0; i<n; i++) //All nodes in tale
+{
+    for (u_int j=0; j<n; j++) //All nodes in head
+    {
+    	for (u_int k=0; k<m; k++) //All tours
+        {
+            //Choice of using connection between i and j
+            x[i, j, k] = IloIntVar(env, 0, max, xname.str().c_str());
+            
+            //Sum over the cost of all connections
+            totalCosts += (x[i,j,k] * Distance(i,j));
+        }
+    }
+}
+...
+model.add(x);
+model.add(IloMinimize(env, totalCosts));
+     
+\end{lstlisting}
+
+
+
+
+
+\begin{lstlisting}[caption=Sample of an implemented constraint,
+label={app:app02}] for(u_int j=0; j<n; ++j) //over all nodes
+{
+    for(u_int k=0; k<m; ++k) //in all tours 
+    {
+        IloExpr incomingConnections(env);
+        for(u_int i=0; i<n; ++i) //sum of incomming connections
+        {
+            incomingConnections += x[i,j,k];
+        }
+        IloExpr outgoingConnections(env);
+        for(u_int l=0; l<n; ++l) //sum of outgoing connections
+        {
+            outgoingConnections += x[j,l,k];
+        }
+        model.add(incomingConnections == outgoingConnections); //equal
+    }
+}
+\end{lstlisting}
+
+\end{appendices}
