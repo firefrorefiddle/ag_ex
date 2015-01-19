@@ -16,7 +16,7 @@ Starting with the standard TSP \cite{miller1960integer} formulation, we have to 
 little to account for the extra properties in TCBVRP. Our basic variables are not
 indexed $x_{ij}$ as in two dimensions, but $x_{ijk}$ where $k$ is the number
 of the tour. So we need $n*n*m$ variables instead of just $n*n$, and $x_{ijk} \in \{0,1\}$
-indicates whether the arch from $i$ to $j$ was taken in tour $k$ (then $x_{ijk} = 1$) or
+indicates whether the arc from $i$ to $j$ was taken in tour $k$ (then $x_{ijk} = 1$) or
 not ($x_{ijk} = 0$).
 
 After declaring the variables, the next thing which is mandatory is an objective function 
@@ -95,7 +95,7 @@ subtour which does not include the depot is not possible because no flow would b
 and therefore the nodes inside the subtour would have negative flow, which is forbidden.
 
 We introduce a new set of variables $f_{ijk}$, corresponding to $x_{ijk}$ describing the units
-of flow over a certain arch $ij$ in a tour $k$. If $x_{ijk} = 0$, then $f_{ijk} = 0$, too.
+of flow over a certain arc $ij$ in a tour $k$. If $x_{ijk} = 0$, then $f_{ijk} = 0$, too.
 
 \begin{description}
   \item[The depot sends out $|D|$ units of flow.] $D$ here is the set of demand nodes. We do 
@@ -131,7 +131,7 @@ of flow over a certain arch $ij$ in a tour $k$. If $x_{ijk} = 0$, then $f_{ijk} 
 
   \item[flow is at most $|D|$ or $0$] 
 
-  If an arch is not taken, then the flow along it must be zero. Otherwise it may be positive, but 
+  If an arc is not taken, then the flow along it must be zero. Otherwise it may be positive, but 
   not more than $|D|$.
 
   \begin{equation}
@@ -159,25 +159,39 @@ This is very similar to SCF, but we need $|D|$ times more variables, because we 
         \forall j>0. \forall i \neq j. \forall k. r_{jk} \geq x_{ijk}
      \end{equation}
 
-  \item[A demand node subtracts a unit of flow if it reached in a tour, and passes it on unmodified
-        otherwise.] We can now formulate this crucial property.
+  \item[A demand node subtracts a unit of its own flow if it reached in a tour, passes on
+        all other flow unmodified.]
   \begin{equation}
-        \forall j>0 \in D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = r_{jk}
+        \forall c \in D. \forall j \in D. \forall k. \sum_{i \neq j} f_{ijkc} = \sum_{l \neq j \in N} f_{jlkc} = r_{jk}
   \end{equation}
 
   \item[Any other node passes on flow unmodified.]
   \begin{equation}
-        \forall j>0, j \in N \setminus D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = 0
+        \forall c \in D. \forall j>0, j \in N \setminus D. \forall k. \sum_{i \neq j} f_{ijkc} = \sum_{l \neq j \in N} f_{jlkc} = 0
   \end{equation}
 
-  \item[flow is at most $|D|$ or $0$] 
-
-  If an arch is not taken, then the flow along it must be zero. Otherwise it may be positive, but 
-  not more than $|D|$.
+  \item[flow is at most $1$ or $0$] 
 
   \begin{equation}
-        \forall i. \forall j \neq i. \forall k. 0 \leq f_{ijk} \leq |D| x_{ijk}
+        \forall c \in D. \forall i. \forall j \neq i. \forall k. 0 \leq f_{ijk} \leq x_{ijk}
   \end{equation}
 
-
 \end{description}
+
+\subsection{Miller-Tucker-Zemlin}
+
+This implementation just assigns a number to each node. In comparison to the standard TSP problem, all we had to add was constraints to ensure that nodes reached in later tours had higher numbers than those in earlier tours (although it's not clear whether this is even necessary).
+
+This gives rise to a very simple formulation; it performed poorly, however.
+
+For each node except the depot, we have a number variable $u_i$, $i$ being the node index, and $1 \leq u_i \leq n-1$ containing the number of this node.
+
+\begin{description}
+ \item[Each arc leads to a node with a number no higher than the previous one.] $M=n-2$ as in the original MTZ specification.
+ \begin{equation}
+        \forall i. \forall j \neq i. \forall k. \forall l \in M, l \neq k. 
+               u_{i} + x_{ijk} \leq u_j + M * (1 - x_{ijl})
+ \end{equation}  
+  
+\end{description}
+
