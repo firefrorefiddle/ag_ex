@@ -87,7 +87,7 @@ then $i, j \in N$ and $k \in M$. We designate the depot as node $0$.
     \end{equation}
 \end{description}
 
-\subsection{Single Commodity Flow}
+\subsection{Single Commodity Flow (SCF)}
 
 We need the additional constraints in SCF, MCF and MTZ to avoid subtours. The idea n SCF is
 to send out some commodity from the depot and have each reached node subtract one. Thus, a 
@@ -129,6 +129,52 @@ of flow over a certain arch $ij$ in a tour $k$. If $x_{ijk} = 0$, then $f_{ijk} 
         \forall j>0, j \in N \setminus D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = 0
   \end{equation}
 
-  \item[flow is at most $|D|$ or $0$] \textbf{TODO!}
+  \item[flow is at most $|D|$ or $0$] 
+
+  If an arch is not taken, then the flow along it must be zero. Otherwise it may be positive, but 
+  not more than $|D|$.
+
+  \begin{equation}
+        \forall i. \forall j \neq i. \forall k. 0 \leq f_{ijk} \leq |D| x_{ijk}
+  \end{equation}
+\end{description}
+
+\subsection{Multi Commodity Flow (MCF)}
+
+This is very similar to SCF, but we need $|D|$ times more variables, because we send out $|D|$ commodities, and only one unit of each. Thus, our $f_{ijk}$ variables turn into $f_{ijkc}$, where $c$ is the index of a demand node corresponding to a commodity.
+
+\begin{description}
+  \item[The depot sends out $1$ unit of flow per demand node.]
+     \begin{equation}
+       \forall c \in D. \sum_{j>0,k} f_{0jkc} = 1
+     \end{equation}
+
+  \item[The depot 
+
+  \item[A node is either reached in a certain tour or not.] This is the same as in SCF.
+     \begin{equation}
+        \forall j>0. \forall i \neq j. \forall k. r_{jk} \geq x_{ijk}
+     \end{equation}
+
+  \item[A demand node subtracts a unit of flow if it reached in a tour, and passes it on unmodified
+        otherwise.] We can now formulate this crucial property.
+  \begin{equation}
+        \forall j>0 \in D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = r_{jk}
+  \end{equation}
+
+  \item[Any other node passes on flow unmodified.]
+  \begin{equation}
+        \forall j>0, j \in N \setminus D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = 0
+  \end{equation}
+
+  \item[flow is at most $|D|$ or $0$] 
+
+  If an arch is not taken, then the flow along it must be zero. Otherwise it may be positive, but 
+  not more than $|D|$.
+
+  \begin{equation}
+        \forall i. \forall j \neq i. \forall k. 0 \leq f_{ijk} \leq |D| x_{ijk}
+  \end{equation}
+
 
 \end{description}
