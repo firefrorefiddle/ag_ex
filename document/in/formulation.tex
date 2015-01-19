@@ -1,8 +1,8 @@
 Moving toward the ultimate goal of finding an optimal solution for the problem
-stated before, the first step is to formulate this problem is a way solvable by
+stated before, the first step is to formulate this problem in a way solvable by
 integer programming \cite{garfinkel1972integer}. Subsequently these formulae can be easily structured
 and implemented such that available integer programming solvers can be utilized to
-find our required answer. Here as suggested by course instructors, IBM ILOG
+find our required answer. Here as suggested by the course instructors, IBM ILOG
 CPLEX Solver \cite{cplex2009v12}
 is used to find the proper answer to a mixed integer linear program created and
 formulated out of requirements of mentioned problem.
@@ -29,13 +29,13 @@ objective function:
 
 Where $c_{ij}$ designates the cost of the connection $ij$.
 
-Now since the objective function is declared, so the constraint must be defined
+Now since the objective function is declared, so the constraints must be defined
 as well. Let's start with the requirements listed before and formulate them one
 by one.
 
 The basic constraints are the same for all three formulations. $D$ denotes the
 set of demand nodes, $S$ the set of supply nodes. If not otherwise designated,
-then $i, j \in N$ and $k \in M$. We designate the depot as node $0$.
+then $i, j \in N$ and $k \in M$. We specify the depot as node $0$.
 
 \begin{description}
   \item[Each demand node is visited exactly once.]
@@ -89,8 +89,8 @@ then $i, j \in N$ and $k \in M$. We designate the depot as node $0$.
 
 \subsection{Single Commodity Flow (SCF)}
 
-We need the additional constraints in SCF, MCF and MTZ to avoid subtours. The idea n SCF is
-to send out some commodity from the depot and have each reached node subtract one. Thus, a 
+We need the additional constraints in SCF, MCF and MTZ to avoid subtours. The
+idea in SCF is to send out some commodity from the depot and have each reached node subtract one. Thus, a 
 subtour which does not include the depot is not possible because no flow would be coming in
 and therefore the nodes inside the subtour would have negative flow, which is forbidden.
 
@@ -129,7 +129,7 @@ of flow over a certain arc $ij$ in a tour $k$. If $x_{ijk} = 0$, then $f_{ijk} =
         \forall j>0, j \in N \setminus D. \forall k. \sum_{i \neq j} f_{ijk} = \sum_{l \neq j \in N} f_{jlk} = 0
   \end{equation}
 
-  \item[flow is at most $|D|$ or $0$] 
+  \item[Flow is at most $|D|$ or $0$] 
 
   If an arc is not taken, then the flow along it must be zero. Otherwise it may be positive, but 
   not more than $|D|$.

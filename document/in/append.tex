@@ -46,4 +46,34 @@ label={app:app02}] for(u_int j=0; j<n; ++j) //over all nodes
 }
 \end{lstlisting}
 
+
+\begin{lstlisting}[caption=Miller-Tucker-Zemlin,
+label={app:app03}]
+///Some initiations...
+...
+const int M = n - 2;
+for (u_int i = 1; i < n; i++)
+{
+    model.add(1 <= u[i]);
+    model.add(u[i] <= (int)(n - 1));
+
+    for (u_int j = 1; j < n; j++)
+    {
+        if (i == j) continue;
+
+        for (u_int k = 0; k < m; k++)
+        {
+            IloExpr left(env);
+            IloExpr right(env);
+            left += (u[i] + x[i, j, k]);
+            for (u_int l = k; l < m; l++)
+            {
+                right += (u[j] + M * (1 - x[i, j, l]));
+                model.add(left <= right);
+            }
+        }
+    }
+}
+\end{lstlisting}
+
 \end{appendices}
