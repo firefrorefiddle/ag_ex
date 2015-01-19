@@ -24,10 +24,11 @@ do
 		for m in "${ms[@]}"
 		do 
 		    filename="tcbvrp_${size}_${index}_T${limit}_m${m}.prob"
-		    if [ -e "${instance_dir}/${filename}" ]
+		    outfile="${filename}_${method}.out"
+		    errfile="${filename}_${method}.err"
+
+		    if [ -e "${outfile}" ]
 		    then 
-			outfile="${filename}_${method}.out"
-			errfile="${filename}_${method}.err"
 			
 			status=`grep "CPLEX status" $outfile | awk '{print $3;}'`
 			bnb=`grep "Branch-and-Bound" $outfile | awk '{print $3;}'`
