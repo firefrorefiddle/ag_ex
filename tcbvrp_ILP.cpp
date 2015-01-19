@@ -367,7 +367,7 @@ void tcbvrp_ILP::modelSCF()
         }
 
         //
-        // ** flow at most n-1 or 0
+        // ** flow at most D or 0
         //
         for (u_int i = 0; i < n; i++)
         {
@@ -461,11 +461,12 @@ void tcbvrp_ILP::modelMCF()
 
                 if (j == c)
                 {
-                    model.add((sumIncoming - sumOutgoing) == any);
+		  model.add(sumIncoming == any);
+		  model.add(sumOutgoing == 0);
                 }
                 else
                 {
-                    model.add((sumIncoming - sumOutgoing) == 0);
+                    model.add(sumIncoming == sumOutgoing);
                 }
 
             }
@@ -479,12 +480,13 @@ void tcbvrp_ILP::modelMCF()
                 {
                     if (i == j) continue;
                     model.add(flow[index3(i, j, k)] >= 0);
-                    model.add(flow[index3(i, j, k)] <= (x[index3(i, j, k)] * ((int) n - 1)));
+                    model.add(flow[index3(i, j, k)] <= x[index3(i, j, k)]);
                 }
             }
         }
 
-        model.add((sumDepotOut - sumDepotIn) == 1);
+        model.add(sumDepotOut == 1);
+	model.add(sumDepotIn == 0);
     }
 }
 
